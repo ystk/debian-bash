@@ -1,3 +1,156 @@
+bash (4.2+dfsg-0.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * Remove unused and non DFSG-compliant bash-4.2/lib/readline/doc from
+    source. (Closes: #695709)
+
+ -- David Prévot <taffit@debian.org>  Sat, 29 Dec 2012 21:19:34 -0400
+
+bash (4.2-5.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * debian/bash.preinst-lib.c: typo in fcntl argument (Closes: #679198).
+
+ -- Nicolas Boulenguez <nicolas@debian.org>  Tue, 11 Dec 2012 22:02:44 +0100
+
+bash (4.2-5) unstable; urgency=low
+
+  * Apply upstream patch 037, fix for
+    - Attempting to redo (using `.') the vi editing mode `cc', `dd', or `yy'
+      commands leads to an infinite loop.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 03 Aug 2012 01:21:14 +0200
+
+bash (4.2-4) unstable; urgency=high
+
+  * Apply upstream patches 030 - 036, fixes for
+    - When attempting to glob strings in a multibyte locale, and those strings
+      contain invalid multibyte characters that cause mbsnrtowcs to return 0,
+      the globbing code loops infinitely.
+    - A change between bash-4.1 and bash-4.2 to prevent the readline input hook
+      from being called too frequently had the side effect of causing delays
+      when reading pasted input on systems such as Mac OS X.  This patch fixes
+      those delays while retaining the bash-4.2 behavior.
+    - Bash-4.2 has problems with DEL characters in the expanded value of
+      variables used in the same quoted string as variables that expand
+      to nothing.
+    - Bash uses a static buffer when expanding the /dev/fd prefix for the test
+      and conditional commands, among other uses, when it should use a dynamic
+      buffer to avoid buffer overflow.
+    - In bash-4.2, the history code would inappropriately add a semicolon to
+      multi-line compound array assignments when adding them to the history.
+    - When given a number of lines to read, `mapfile -n lines' reads
+      one too many.
+    - Bash-4.2 produces incorrect word splitting results when expanding
+      double-quoted $@ in the same string as and adjacent to other variable
+      expansions.  The $@ should be split, the other expansions should not.
+
+ -- Matthias Klose <doko@debian.org>  Thu, 12 Jul 2012 23:58:51 +0200
+
+bash (4.2-3) unstable; urgency=low
+
+  * Apply upstream patches 025 - 029, fixes for
+    - When used in a shell function, `declare -g -a array=(compound assignment)'
+      creates a local variable instead of a global one.
+    - The `lastpipe' option does not behave correctly on machines where the
+      open file limit is less than 256.
+    - When the `extglob' shell option is enabled, pattern substitution does not
+      work correctly in the presence of multibyte characters.
+    - When using a word expansion for which the right hand side is evaluated,
+      certain expansions of quoted null strings include spurious ^? characters.
+    - Bash-4.2 tries to leave completed directory names as the user typed them,
+      without expanding them to a full pathname.  One effect of this is that
+      shell variables used in pathnames being completed (e.g., $HOME) are left
+      unchanged, but the `$' is quoted by readline because it is a special
+      character to the shell. This patch introduces two things:
+      - A new shell option, `direxpand', which, if set, attempts to emulate the
+        bash-4.1 behavior of expanding words to full pathnames during
+        completion;
+      - A set of heuristics that reduce the number of times special characters
+        such as `$' are quoted when the directory name is not expanded.
+  * Mark bash and bash-static as Multi-Arch: foreign . Closes: #674120.
+  * Avoid warning for unset debian_chroot with -u (Marko Mäkelä).
+    Closes: #659940.
+  * Fix string expansion: \u and \U for code points U+0080 to U+00FF (Darran
+    Salt). Closes: #661386.
+  * Search $- for `i' for the interactivity test. Closes: #482194.
+  * Search for bash_completion in /usr/share/bash-completion too.
+    Closes: #655071, #655208.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 01 Jul 2012 13:45:35 +0200
+
+bash (4.2-2) unstable; urgency=low
+
+  * Fix command-not-found location. Closes: #529313.
+  * Print a replacement error message if command-not-found was removed
+    after bashrc was loaded. Closes: #631023. LP: #561155.
+  * skel.bashrc: Document and prepare enabling the globstar feature (Fabian
+    Greffrath). Closes: #627926.
+  * Apply upstream patches 021 - 024.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 30 Mar 2012 19:20:04 +0200
+
+bash (4.2-1) unstable; urgency=low
+
+  [ Matthias Klose ]
+  * New upstream version.
+  * Apply upstream patches 001 - 020.
+  * Fix parsing of double doublequotes. LP: #780441.
+  * /etc/bash.bashrc:
+    - Fix quoting issue calling command-not-found. LP: #754859. Closes: #587185.
+  * Don't cache the value of brk between sbrk calls (Samuel Thibault).
+    Closes: #614815.
+  * Remove the bashdb and bash-completion packaging rules and files.
+  * Just link with libtinfo instead of libncurses if available.
+  * Make lintian happy.
+  * Use quilt to apply patches.
+  * Fix build error with -Werror=format-security (Pierre Chifflier).
+    Closes: #641350.
+  * Fix build for the binary target, without calling the build target.
+    Closes: #602159.
+  * Fix cross builds (Steve McIntyre). Closes: #629929.
+
+  [ Jonathan Nieder ]
+  * Update copyright file. Many files that were GPL-2+ were relicensed
+    under GPL-3+ in bash 4.0-rc1. Closes: #632177.
+  * debian/rules: Use "rm -rf" instead of rmdir to remove usr/share/info
+    directory in "with_gfdl = no" build. This prevents build failures when
+    using the unmodified upstream tarball.
+  * bash.preinst: Tidy up a little.
+    - Remove codepath that would rename .bash_profile → .profile if .profile
+      was unmodified from the gutsy → hardy transition. Closes: #602244
+    - Remove commented experiment from bash-completion transition.
+    - Remove misleading "dpkg --assert-support-predepends" check.
+      Closes: #602456.
+    - Move utility functions to a separate bash.preinst-lib.c and corresponding
+      declarations to bash.preinst.h.
+  * Remove /bin/sh symlink and /usr/share/man/man1/sh.1.gz from bash package
+    contents. Closes: #602483.
+    - debian/rules: Do not install /bin/sh and sh.1.gz symlinks.
+    - bash.preinst:
+      - Make sure /bin/sh is present and points to an executable, forcibly
+        creating symlinks /bin/sh -> bash and /usr/share/man/man1/sh.1.gz ->
+        bash.1.gz if not.
+      - Divert /bin/sh and sh.1.gz on behalf of dash if we are upgrading from
+        a bash version with /bin/sh in the files list and bash's copy of
+        /bin/sh is not already diverted. This ensures unpacking bash will not
+        cause /bin/sh to go missing.
+  * bash.postinst: Simplify comment that contained an implementation detail
+    about how /bin/sh is provided.
+  * Use dpkg-buildflags to retrieve compiler options, including hardening flags.
+    Build-Depends: dpkg-dev (>= 1.16.1) (Steve Langasek). Closes: #629929.
+  * Pass --host to configure only when cross-compiling, --build always, as
+    recommended in autotools documentation (Steve Langasek).
+
+  * Merge from Ubuntu (closes: #648578):
+    - /etc/skel/.bashrc:
+      - Don't set HISTCONTROL twice. Thanks to Kevin Knerr. LP: #465500.
+      - Set HISTFILESIZE to 2000 and HISTSIZE to 1000. LP: #544542.
+      - README.Debian: Remove obsolete entry "Why is bash configured
+        with --disable-net-redirections?"
+
+ -- Matthias Klose <doko@debian.org>  Wed, 30 Nov 2011 07:29:05 +0100
+
 bash (4.1-3) unstable; urgency=low
 
   * Apply upstream patches 003, 004, 005.
