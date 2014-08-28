@@ -1,3 +1,192 @@
+bash (4.3-9) unstable; urgency=medium
+
+  * Apply upstream patches 023 - 024, fixing the issues:
+    - bash does not correctly parse process substitution constructs that
+      contain unbalanced parentheses as part of the contained command.
+    - Indirect variable references do not work correctly if the reference
+      variable expands to an array reference using a subscript other than 0
+      (e.g., foo='bar[1]' ; echo ${!foo}).
+  * debian/skel.bashrc: Add GCC_COLORS setting (disabled by default).
+
+ -- Matthias Klose <doko@debian.org>  Thu, 21 Aug 2014 22:58:16 +0200
+
+bash (4.3-8) unstable; urgency=medium
+
+  * Apply upstream patches 012 - 022, fixing the issues:
+    - When a SIGCHLD trap runs a command containing a shell builtin while a
+      script is running `wait' to wait for all running children to complete,
+      the SIGCHLD trap will not be run once for each child that terminates.
+    - Using reverse-i-search when horizontal scrolling is enabled does not
+      redisplay the entire line containing the successful search results.
+    - Under certain circumstances, $@ is expanded incorrectly in contexts
+      where word splitting is not performed.
+    - When completing directory names, the directory name is dequoted twice.
+      This causes problems for directories with single and double quotes in
+      their names.
+    - An extended glob pattern containing a slash (`/') causes the globbing
+      code to misinterpret it as a directory separator.
+    - The code that creates local variables should not clear the `invisible'
+      attribute when returning an existing local variable.  Let the code that
+      actually assigns a value clear it.
+    - When assigning an array variable using the compound assignment syntax,
+      but using `declare' with the rhs of the compound assignment quoted, the
+      shell did not mark the variable as visible after successfully performing
+      the assignment.
+    - The -t timeout option to `read' does not work when the -e option is used.
+      LP: #1317476.
+    - When PS2 contains a command substitution, here-documents entered in an
+      interactive shell can sometimes cause a segmentation fault.
+    - When the readline `revert-all-at-newline' option is set, pressing newline
+      when the current line is one retrieved from history results in a double
+      free and a segmentation fault. Closes: #747341.
+    - Using nested pipelines within loops with the `lastpipe' option set can
+      result in a segmentation fault.
+  * Fix typo in package description. Closes: #707810.
+
+ -- Matthias Klose <doko@debian.org>  Sun, 03 Aug 2014 18:14:31 +0200
+
+bash (4.3-7) unstable; urgency=medium
+
+  * Apply upstream patches 009 - 011 (replacing local patches):
+    - Fix a problem with unsigned sign extension when attempting to reallocate
+      the input line when it is fewer than 3 characters long and there has been
+      a history expansion.  The sign extension causes the shell to not
+      reallocate the line, which results in a segmentation fault when it writes
+      past the end.
+    - Change the behavior of programmable completion to compensate for two
+      assumptions made by the bash-completion package.
+    - The signal handling changes to bash and readline (to avoid running any
+      code in a signal handler context) cause the cursor to be placed on the
+      wrong line of a multi-line command after a ^C interrupts editing.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 16 Apr 2014 23:10:28 +0200
+
+bash (4.3-6) unstable; urgency=medium
+
+  * Apply upstream patches 001 - 008:
+    - A missing check for a valid option prevented `test -R' from working.
+      There is another problem that causes bash to look up the wrong variable
+      name when processing the argument to `test -R'.
+    - A change to save state while running the DEBUG trap caused pipelines to
+      hang on systems which need process group synchronization while building
+      pipelines.
+    - When in callback mode, some readline commands can cause readline
+      to segfault by passing invalid contexts to callback functions.
+    - The `.' command in vi mode cannot undo multi-key commands beginning with
+      `c', `d', and `y' (command plus motion specifier).
+    - When in Posix mode, bash did not correctly interpret the ANSI-C-style
+      $'...' quoting mechanism when performing pattern substitution word
+      expansions within double quotes.
+    - A shell that started with job control active but was not interactive left
+      the terminal in the wrong process group when exiting, causing its parent
+      shell to get a stop signal when it attempted to read from the terminal.
+    - Using compound assignments for associative arrays like
+        assoc=( [x]= [y]=bar )
+      left the value corresponding to the key `x' NULL.  This caused
+      subsequent lookups to interpret it as unset.
+    - Some extended glob patterns incorrectly matched filenames with a leading
+      dot, regardless of the setting of the `dotglob' option.
+  * Replace already applied patches by the upstream patch files.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 07 Apr 2014 22:20:10 +0200
+
+bash (4.3-5) unstable; urgency=medium
+
+  * Fix a display issue when a multiline command is aborted with ^C.
+  * Fix a crash after a failed history expansion. LP: #1294669.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 29 Mar 2014 19:10:21 +0100
+
+bash (4.3-4) unstable; urgency=high
+
+  * Fix an issue with an associative array expanding to the
+    empty string if the associated value is the empty string.
+  * Fix an issue, when invoked as sh, bash doesn't interpret C-style escapes
+    within double-quoted substitution expansions ("${var/$'what'/ever}").
+  * Fix an issue with the extglob option to not expand hidden files.
+  * Update the pcomplete-dequote patch.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 21 Mar 2014 15:20:45 +0100
+
+bash (4.3-3) unstable; urgency=medium
+
+  * Fix an issue with with empty completions and bash-completion.
+    Closes: #741060 . LP: #1291586.
+  * Fix an issue with updating terminal titles using trap commands.
+    LP: #1294167.
+  * Fix an issue in vi-mode, not re-doing the latest "dw", "dl", "D", ...
+    commands.
+  * Fix segfault in _rl_dispatch_callback(). Closes: #741555.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 19 Mar 2014 18:54:13 +0100
+
+bash (4.3-2) unstable; urgency=medium
+
+  * Build-depend on texlive-fonts-recommended.
+  * Work around a build failure of bash static on ppc64el.
+  * Only include the documentation into the bash-doc package. Closes:
+
+ -- Matthias Klose <doko@debian.org>  Wed, 05 Mar 2014 05:05:16 +0100
+
+bash (4.3-1) unstable; urgency=medium
+
+  * Bash 4.3 release.
+  * Update debian/copyright.
+
+ -- Matthias Klose <doko@debian.org>  Mon, 03 Mar 2014 08:16:58 +0100
+
+bash (4.3~rc2-1) experimental; urgency=medium
+
+  * New upstream version 4.3 rc2.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 05 Feb 2014 15:20:17 +0100
+
+bash (4.3~rc1-1) experimental; urgency=medium
+
+  * New upstream version 4.3 rc1.
+
+ -- Matthias Klose <doko@debian.org>  Fri, 27 Dec 2013 23:01:38 +0100
+
+bash (4.3~beta2-1) experimental; urgency=low
+
+  * New upstream version 4.3 beta2.
+
+ -- Matthias Klose <doko@debian.org>  Wed, 23 Oct 2013 13:59:32 +0200
+
+bash (4.2+dfsg-1) unstable; urgency=low
+
+  * Apply upstream patches 038 - 045, fixes for
+    - If a backslash-newline (which is removed) with no other input is given as
+      input to `read', the shell tries to dereference a null pointer and
+      segfaults.
+    - Under certain circumstances, bash attempts to expand variables in
+      arithmetic expressions even when evaluation is being suppressed.
+    - Output redirection applied to builtin commands missed I/O errors if
+      they happened when the file descriptor was closed, rather than on write
+      (e.g., like with an out-of-space error on a remote NFS file system).
+    - Process substitution incorrectly inherited a flag that inhibited using the
+      (local) temporary environment for variable lookups if it was providing
+      the filename to a redirection.  The intent the flag is to enforce the
+      Posix command expansion ordering rules.
+    - Compilation failed after specifying the  `--enable-minimal-config' option
+      to configure (more specifically, specifying `--disable-alias').
+    - When SIGCHLD is trapped, and a SIGCHLD trap handler runs when a pending
+      `read -t' invocation times out and generates SIGALRM, bash can crash with
+      a segmentation fault.
+    - When converting a multibyte string to a wide character string as part of
+      pattern matching, bash does not handle the end of the string correctly,
+      causing the search for the NUL to go beyond the end of the string and
+      reference random memory.  Depending on the contents of that memory, bash
+      can produce errors or crash.
+    - The <&n- and >&n- redirections, which move one file descriptor to another,
+      leave the file descriptor closed when applied to builtins or compound
+      commands.
+  * Fix parallel build (Steven Chamberlain). Closes: #694659.
+  * Fix german translations. Closes: #688571.
+  * Fix typo in man page. Closes: #696706.
+
+ -- Matthias Klose <doko@debian.org>  Sat, 30 Mar 2013 14:56:51 +0100
+
 bash (4.2+dfsg-0.1) unstable; urgency=low
 
   * Non-maintainer upload.
